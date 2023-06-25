@@ -230,6 +230,9 @@ void Manager::setTabsAndEditorVisible(bool b)
 
 QWidget * Manager::createTabs(QWidget *parent)
 {
+    if(m_widgetStack != Q_NULLPTR) {
+        delete m_widgetStack;
+    }
     m_widgetStack = new QStackedWidget(parent);
     DropWidget *emptyDropWidget = new DropWidget(m_widgetStack);
     m_widgetStack->insertWidget(0, emptyDropWidget);
