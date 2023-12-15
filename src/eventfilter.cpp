@@ -29,8 +29,17 @@
 #include "kiledebug.h"
 #include "editorextension.h"
 #include "kileconfig.h"
+#include "kiletoolmanager.h"
+#include "kileviewmanager.h"
+#include "livepreview.h"
 
-LaTeXEventFilter::LaTeXEventFilter(KTextEditor::View *view, KileDocument::EditorExtension *edit) : QObject(view), m_view(view), m_edit(edit)
+LaTeXEventFilter::LaTeXEventFilter(
+    KTextEditor::View *view, KileDocument::EditorExtension *edit,
+    KileView::Manager *viewManager,
+    KileTool::LivePreviewManager *livePreviewManager,
+    KileTool::Manager *toolManager)
+    : QObject(view), m_view(view), m_edit(edit), m_viewManager(viewManager),
+      m_previewManager(livePreviewManager), m_toolManager(toolManager)
 {
     m_modifierKeyInfo = new KModifierKeyInfo(this);
     readConfig();
@@ -268,6 +277,33 @@ bool LaTeXEventFilter::eventFilter(QObject* /* o */, QEvent *e)
         if(me->button() == Qt::LeftButton && me->modifiers() & Qt::ControlModifier) {
             m_edit->selectWord(KileDocument::EditorExtension::smTex, m_view);
             return true;
+        }
+    }
+
+    else if (e->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *me = static_cast<QMouseEvent *>(e);
+        if (me->button() == Qt::LeftButton &&
+            me->modifiers() & Qt::ShiftModifier) { // forward search
+            // live preview
+            if (m_previewManager->isLivePreviewEnabledForCurrentDocument()) {
+                m_previewManager->showCursorPositionInDocumentViewer();
+                return true;
+            }
+            // PDF
+            auto forwardPdfTool = m_toolManager->createTool("ForwardPDF");
+            forwardPdfTool->prepareToRun();
+            if (QFileInfo(forwardPdfTool->target()).suffix().compare("pdf", Qt::CaseInsensitive) == 0) {
+                m_toolManager->run(forwardPdfTool);
+                return true;
+            }
+            // DVI
+            auto forwardDviTool = m_toolManager->createTool("ForwardDVI");
+            forwardDviTool->prepareToRun();
+            if (QFileInfo(forwardDviTool->target()).suffix().compare("dvi", Qt::CaseInsensitive) == 0) {
+                m_toolManager->run(forwardDviTool);
+                return true;
+            }
+            return false;
         }
     }
 
