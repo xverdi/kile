@@ -2,7 +2,7 @@
     "id": "org.kde.kile",
     "branch": "master",
     "runtime": "org.kde.Platform",
-    "runtime-version": "5.15-22.08",
+    "runtime-version": "5.15-23.08",
     "sdk": "org.kde.Sdk",
     "command": "kile",
     "tags": ["nightly"],
@@ -15,7 +15,7 @@
     "add-extensions": {
         "org.freedesktop.Sdk.Extension.texlive": {
             "directory": "texlive",
-            "version": "20.08"
+            "version": "23.08"
         }
     },
 
@@ -282,19 +282,35 @@
             "name": "okular",
             "buildsystem": "cmake-ninja",
             "builddir": true,
-            "sources": [ { "type": "git", "url": "https://invent.kde.org/graphics/okular.git", "branch": "master" } ]
+            "sources": [
+                { 
+                    "type": "git",
+                    "url": "https://invent.kde.org/graphics/okular.git",
+                    "branch": "release/23.08"
+                } 
+            ]
         },
         {
             "name": "konsole",
             "buildsystem": "cmake-ninja",
             "sources": [
-                { "type": "git", "url": "https://invent.kde.org/utilities/konsole.git" }
+                { 
+                    "type": "git",
+                    "url": "https://invent.kde.org/utilities/konsole.git",
+                    "branch": "release/23.08"
+                } 
             ]
         },
         {
             "name": "kile",
             "buildsystem": "cmake-ninja",
-            "sources": [ { "type": "git", "url": "https://invent.kde.org/office/kile.git" } ]
+            "sources": [
+                {
+                  "type": "dir",
+                  "path": "."
+                }
+              ]
+        
         },
         {
             "name": "texlive-mountpoint",
